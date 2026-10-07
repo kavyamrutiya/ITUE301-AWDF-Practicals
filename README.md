@@ -1,7 +1,7 @@
 # ITUE301 Advanced Web Development Frameworks
 ## Practical Submission 1–11
 
-**Student Name:** Kavya Mrutiya  
+**Student Name:** Kavy Amrutiya 
 **Course Code:** ITUE301 (5th Semester)  
 **Department:** Computer Engineering, FTE  
 **University:** Charotar University of Science and Technology (CHARUSAT)  
