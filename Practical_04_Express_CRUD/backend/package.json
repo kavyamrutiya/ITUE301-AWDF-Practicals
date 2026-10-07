@@ -1,0 +1,14 @@
+{
+  "name": "practical-04-express-crud",
+  "version": "1.0.0",
+  "description": "Practical 4: RESTful API with Node.js and Express (In-Memory CRUD)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test-crud.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,92 @@
+# ========================================================
+# Docker Compose Orchestration (Practical 11)
+# Services:
+#   1. mongodb  - Official MongoDB 6.0 Image
+#   2. backend  - Node.js/Express + JWT + Cache + Events
+#   3. frontend - React Vite Single Page Application
+# Network: app-network (Bridge)
+# Persistence: Named volume mongo-data
+# ========================================================
+
+services:
+  # ------------------------------------------------------
+  # Service 1: MongoDB Database
+  # ------------------------------------------------------
+  mongodb:
+    image: mongo:6.0
+    container_name: awdf-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=taskdb_docker
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # ------------------------------------------------------
+  # Service 2: Node.js & Express Backend API
+  # ------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: awdf-backend
+    restart: unless-stopped
+    environment:
+      - PORT=5001
+      # Connects using Compose service name 'mongodb', NOT localhost!
+      - MONGO_URI=mongodb://mongodb:27017/taskdb_docker
+      - JWT_SECRET=supersecretjwtkey_awdf_2026_practical11
+      - JWT_EXPIRE=1h
+      - CACHE_ENABLED=true
+      - NODE_ENV=production
+    ports:
+      - "5001:5001"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # ------------------------------------------------------
+  # Service 3: React Frontend SPA (Vite Multi-stage)
+  # ------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: awdf-frontend
+    restart: unless-stopped
+    environment:
+      # Browser-side HTTP API calls reach host port 5001
+      - VITE_API_URL=http://localhost:5001
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+# --------------------------------------------------------
+# Bridge Network for Inter-Container Communication
+# --------------------------------------------------------
+networks:
+  app-network:
+    name: awdf-app-network
+    driver: bridge
+
+# --------------------------------------------------------
+# Named Volume for Persistent Database Storage
+# --------------------------------------------------------
+volumes:
+  mongo-data:
+    name: awdf-mongo-data
+    driver: local
