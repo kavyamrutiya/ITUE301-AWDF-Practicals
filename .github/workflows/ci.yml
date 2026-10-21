@@ -1,0 +1,97 @@
+# ==============================================================================
+# GitHub Actions CI/CD Pipeline (Practical 12)
+# Author: Kavy Amrutiya
+# Course: ITUE301 - Advanced Web Development Frameworks
+# Institution: Charotar University of Science and Technology (CHARUSAT)
+# ==============================================================================
+
+name: CI Pipeline
+
+on:
+  # Triggers the pipeline on push events to the main branch (Primary Requirement)
+  push:
+    branches: [main]
+  # Triggers the pipeline on pull request events targeting the main branch (Supplementary Requirement)
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # Job 1: Code Linting & Static Analysis (Supplementary Problem 1)
+  # ----------------------------------------------------------------------------
+  lint:
+    name: 🔍 Static Code Analysis (ESLint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: 'Practical_12_CI_CD_Pipeline/backend/package.json'
+
+      - name: 📦 Install Backend Dependencies
+        working-directory: Practical_12_CI_CD_Pipeline/backend
+        run: npm install
+
+      - name: 🔬 Run ESLint
+        working-directory: Practical_12_CI_CD_Pipeline/backend
+        run: npm run lint
+
+  # ----------------------------------------------------------------------------
+  # Job 2: Build & Automated Testing (Core Syllabus Requirement)
+  # ----------------------------------------------------------------------------
+  build-and-test:
+    name: 🧪 Automated Test Suite (Jest & Supertest)
+    needs: lint
+    runs-on: ubuntu-latest
+
+    # Service Container: Spins up official MongoDB 6.0 instance in the CI runner
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      PORT: 5001
+      MONGO_URI: mongodb://127.0.0.1:27017/taskdb_ci_testing
+      JWT_SECRET: supersecret_ci_test_token_awdf_2026
+      JWT_EXPIRE: 1h
+      CACHE_ENABLED: true
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: 'Practical_12_CI_CD_Pipeline/backend/package.json'
+
+      - name: 📦 Install Backend Dependencies
+        working-directory: Practical_12_CI_CD_Pipeline/backend
+        run: npm install
+
+      - name: 🚀 Run Automated Tests (Jest & Supertest)
+        working-directory: Practical_12_CI_CD_Pipeline/backend
+        run: npm test
+
+      - name: 📊 Verify Pipeline Pass Status
+        run: |
+          echo "=========================================================="
+          echo "✅ All automated unit and integration tests passed in CI!"
+          echo "Workflow run completed successfully on ubuntu-latest runner."
+          echo "=========================================================="

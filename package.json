@@ -1,0 +1,15 @@
+{
+  "name": "itue301-awdf-practicals",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ITUE301 Advanced Web Development Frameworks - Practical Submissions",
+  "scripts": {
+    "test": "npm --prefix Practical_12_CI_CD_Pipeline/backend test",
+    "test:p12": "npm --prefix Practical_12_CI_CD_Pipeline/backend test",
+    "test:p12:broken": "npm --prefix Practical_12_CI_CD_Pipeline/backend run test:broken",
+    "lint": "npm --prefix Practical_12_CI_CD_Pipeline/backend run lint",
+    "install:p12": "npm --prefix Practical_12_CI_CD_Pipeline/backend install"
+  },
+  "author": "Kavya Mrutiya",
+  "license": "ISC"
+}

@@ -1,5 +1,7 @@
 # ITUE301 Advanced Web Development Frameworks
-## Practical Submission 1–11
+## Practical Submission 1–12
+
+[![CI Pipeline](https://github.com/kavyamrutiya/ITUE301-AWDF-Practicals/actions/workflows/ci.yml/badge.svg)](https://github.com/kavyamrutiya/ITUE301-AWDF-Practicals/actions/workflows/ci.yml)
 
 **Student Name:** Kavy Amrutiya 
 **Course Code:** ITUE301 (5th Semester)  
@@ -21,6 +23,8 @@ P4 → P5 → P6 → P7
                     └→ P9 → P10
                               ↓
                              P11
+                              ↓
+                             P12 (CI/CD Pipeline with GitHub Actions)
 ```
 
 ### Detailed Flow:
@@ -32,6 +36,7 @@ P4 → P5 → P6 → P7
 - **P9 (Caching):** Integrates `node-cache` (60s TTL) and invalidation pipelines on P7 backend
 - **P10 (EventEmitter):** Adds asynchronous, non-blocking background notifications to P9 backend
 - **P11 (Docker):** Full-stack containerization orchestrating React, Node/Express, and MongoDB via Docker Compose
+- **P12 (CI/CD Pipeline):** Automated continuous integration with GitHub Actions, Jest & Supertest testing, ESLint static analysis, and pass/fail demonstration
 
 ---
 
@@ -39,7 +44,11 @@ P4 → P5 → P6 → P7
 
 ```text
 AWDF_Submission/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                            # Master GitHub Actions CI/CD Pipeline
 ├── README.md                                 # Master submission index & viva guide
+├── package.json                              # Workspace-level test runner scripts
 ├── .gitignore                                # Global exclusion for node_modules, dist, .env
 │
 ├── Practical_01_React_Components/             # P1: React + Vite Component Architecture
@@ -97,12 +106,27 @@ AWDF_Submission/
 │   ├── README.md
 │   └── verification.md
 │
-└── Practical_11_Docker/                       # P11: Containerization with Docker Compose
-    ├── docker-compose.yml                    # Multi-container orchestration (3 services)
-    ├── frontend/ (Dockerfile, .dockerignore) # Multi-stage Vite production preview
-    ├── backend/  (Dockerfile, .dockerignore) # Lean Node 18 production container
-    ├── README.md
-    └── verification.md
+├── Practical_11_Docker/                       # P11: Containerization with Docker Compose
+│   ├── docker-compose.yml                    # Multi-container orchestration (3 services)
+│   ├── frontend/ (Dockerfile, .dockerignore) # Multi-stage Vite production preview
+│   ├── backend/  (Dockerfile, .dockerignore) # Lean Node 18 production container
+│   ├── README.md
+│   └── verification.md
+│
+└── Practical_12_CI_CD_Pipeline/               # P12: CI/CD Pipeline with GitHub Actions
+    ├── .github/workflows/ci.yml              # Portable workflow definition
+    ├── backend/
+    │   ├── tests/api.test.js                 # Passing Jest + Supertest suite (7/7 tests)
+    │   ├── tests/broken.test.js              # Deliberate failure demo test
+    │   ├── .eslintrc.json                    # ESLint linter configuration
+    │   └── server.js, config/, models/       # Full backend with Mongo service support
+    ├── frontend/                             # Full React SPA preserved from Practical 11
+    ├── docker-compose.yml                    # Multi-container orchestration
+    ├── docs/
+    │   ├── failed-pipeline-demo.md           # Detailed failure demonstration report (Red X)
+    │   └── fixed-pipeline-demo.md            # Detailed success demonstration report (Green Check)
+    ├── README.md                             # Comprehensive documentation & Viva guide
+    └── verification.md                       # Rubric verification checklist (20/20 marks)
 ```
 
 ---
@@ -122,6 +146,7 @@ AWDF_Submission/
 | **Practical_09_Caching** | Backend + Docs | node-cache, Express | Cache-Aside pattern (60s TTL), invalidation on mutation, benchmark report in `docs/` |
 | **Practical_10_EventEmitter** | Backend | Node EventEmitter | Non-blocking `task-created` / `task-deleted` events, timestamp logging proof |
 | **Practical_11_Docker** | Full Stack + Docker | Docker Compose | Multi-stage frontend Dockerfile, lean backend container, official MongoDB 6.0 |
+| **Practical_12_CI_CD_Pipeline** | Full Stack + CI/CD | GitHub Actions, Jest, Supertest, ESLint | Automated CI workflow on push/PR; GET /tasks returns 200; linting job; broken demo (Red X) & fixed demo (Green Checkmark) |
 
 ---
 
@@ -157,11 +182,26 @@ cd <Practical_Folder>/frontend
 npm install && npm run dev
 ```
 
-### Containerized Application (Practical 11):
+### Containerized Application (Practical 11 & Practical 12):
 Start all 3 services (`frontend`, `backend`, `mongodb`) with a single command:
 ```bash
-cd Practical_11_Docker
+cd Practical_12_CI_CD_Pipeline
 docker compose up --build
+```
+
+### CI/CD Pipeline Automated Testing (Practical 12):
+Run the automated test suite locally:
+```bash
+cd Practical_12_CI_CD_Pipeline/backend
+npm test                  # Executes passing Jest test suite (7/7 pass)
+npm run test:broken       # Executes deliberate failure demo (asserts 999)
+npm run lint              # Executes ESLint code quality analysis
+```
+Or execute directly from the workspace root:
+```bash
+npm test                  # Root test runner command
+npm run test:p12:broken   # Demonstrates deliberate failure
+npm run lint              # Runs ESLint check across backend
 ```
 
 ---
@@ -177,3 +217,4 @@ docker compose up --build
   JWT_EXPIRE=1h
   ```
 - **Portable Commands:** All instructions use relative paths with no hardcoded local-machine references.
+- **CI Test Isolation:** In GitHub Actions, MongoDB runs as an isolated service container (`mongo:6.0`) ensuring clean, reproducible testing on every commit.
